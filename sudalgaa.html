@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ДЭВШИЛ+ · Үр нөлөөний судалгаа</title>
+<style>
+:root{--ink:#2d1a52;--sec:#6b5a86;--line:#e8def8;--bg:#f7f4fd;--acc:#6d3fd6;--acc2:#8b45e8;--ok:#15803d;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.hero{background:linear-gradient(120deg,#5b2bc4,#8b45e8 60%,#c04fd8);color:#fff;border-radius:22px;padding:22px 22px 18px;margin-bottom:16px;box-shadow:0 10px 30px rgba(91,43,196,.25)}
+.hero h1{margin:0 0 6px;font-size:23px;line-height:1.25}
+.hero p{margin:0;opacity:.95;font-size:14px}
+.prog{height:8px;border-radius:9px;background:rgba(255,255,255,.3);margin-top:14px;overflow:hidden}
+.prog>span{display:block;height:100%;width:0;background:#fff;border-radius:9px;transition:width .2s}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 4px 14px rgba(80,40,140,.05)}
+.sec>h2{margin:0 0 4px;font-size:17px}
+.sec>.hint{margin:0 0 12px;color:var(--sec);font-size:13px}
+.q{padding:12px 0;border-top:1px solid #f1ecf8}
+.q:first-of-type{border-top:0}
+.q>.t{font-weight:700;margin-bottom:8px;font-size:15px}
+.q>.s{color:var(--sec);font-size:12px;margin:-4px 0 8px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1px solid #d9cbf3;background:#fbf9ff;color:var(--ink);border-radius:12px;padding:9px 13px;font:inherit;font-size:14px;cursor:pointer;min-height:42px;text-align:left}
+.opt[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:8px 0;border-top:1px dashed #efe8fa}
+.row:first-child{border-top:0}
+.row .l{font-size:14px}
+.sc{display:flex;gap:6px;flex-wrap:wrap}
+.sc .opt{min-width:40px;padding:8px 10px;text-align:center}
+.sc .opt.na{min-width:auto}
+.scale-lab{display:flex;justify-content:space-between;color:var(--sec);font-size:11px;margin:2px 0 6px}
+input[type=number],textarea{width:100%;font:inherit;border:1px solid #d9cbf3;border-radius:12px;padding:10px 12px;background:#fff;color:var(--ink)}
+input[type=number]{max-width:110px}
+textarea{min-height:80px;resize:vertical}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:700;cursor:pointer}
+.chk input{width:22px;height:22px;margin-top:2px;flex:none;accent-color:var(--acc)}
+.send{width:100%;border:0;border-radius:16px;padding:16px;font:inherit;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(120deg,#5b2bc4,#8b45e8);cursor:pointer;box-shadow:0 8px 22px rgba(91,43,196,.3)}
+.send:disabled{opacity:.6;cursor:default}
+.err{color:#b42318;font-weight:700;font-size:14px;margin:10px 0 0;min-height:1em}
+.done{text-align:center;padding:40px 20px}
+.done .big{font-size:56px}
+.done h2{margin:10px 0 6px}
+@media(max-width:560px){.row{grid-template-columns:1fr}.hero h1{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="hero"><h1>🌿 ДЭВШИЛ+ · Үр нөлөөний судалгаа</h1>
+  <p>ДЭВШИЛ+ ашигласны дараах <b>ОДООГИЙН</b> байдлаараа хариулна уу. Нэргүй, 10 минут. Таны хариулт ДЭВШИЛ+-ийг сайжруулахад хэрэглэгдэнэ.</p>
+  <div class="prog"><span id="prog"></span></div></div>
+  <form id="f" novalidate></form>
+</div>
+<script>
+(function(){'use strict';
+const SB_URL='https://xffvtthmtaunedadwfpg.supabase.co';
+const SB_KEY='sb_publishable_dC0mZGOjXSHQlojelljYeQ_MEBiMPoJ';
+const TABLE='devshil_impact_survey';
+const TASKS=['Сургалтын төлөвлөгөө боловсруулах','Хүүхдийн хөгжлийг ажиглах, бүртгэх','Хүүхдийн үнэлгээний өгөгдлийг нэгтгэх, дүгнэх','Тайлан, бичиг баримт бэлтгэх','Хүүхэд бүрт тохирсон үйл ажиллагаа төлөвлөх','Эцэг эхэд хүүхдийн ахицыг мэдээлэх'];
+const FORMS=['Цаасаар','Word / Excel','ДЭВШИЛ+','Утас / мессенжер','Бусад'];
+const B=[['B1','Бичиг баримтын ажил хэт их цаг шаарддаг.'],['B2','Ижил мэдээллийг өөр өөр маягтад давтан бичих тохиолдол их.'],['B4','Хүүхэд бүрийн хөгжлийн ахицыг цаг тухайд нь хянахад хэцүү.'],['B5','Үнэлгээний өгөгдлийг нэгтгэж, дүгнэлт гаргахад хэцүү.'],['B8','Эцэг эхэд хүүхдийн ахицыг тогтмол мэдээлэх хэрэгсэл дутмаг.']];
+const A=[['A1','ДЭВШИЛ+ ажлын ачааллыг минь бууруулсан.'],['A2','ДЭВШИЛ+ хүүхэд бүрийн ахицыг харахад тусалдаг.'],['A3','ДЭВШИЛ+ надад ажилдаа хэрэгтэй.'],['X1','ДЭВШИЛ+-ийг ашиглахад хялбар.'],['X2','Хэрэгтэй цэс, хэсгээ амархан олдог.'],['X3','Бусдын тусламжгүйгээр ашиглаж чаддаг болсон.']];
+const M=['Хүүхдийн хөгжлийн цахим хавтас','Ажиглалт бичих (зурагтай)','«AI-аар цэгцлэх» ажиглалтын туслах','Сарын явцын үнэлгээ (ангиараа үнэлэх)','Нүүр хуудас («удаан ажиглаагүй» хүүхэд гэх мэт)','Ангийн нэгтгэл, график, тайлан','Сургалтын хөтөлбөр, төлөвлөгөө илгээх, материалын сан','Эцэг эхтэй холбогдох, мэдээ','«Бяцхан зураач»'];
+const ans={q5a:{},q5b:{},q5c:{},q8:{},q9:{},q10:{}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let html='';
+const sec=(t,h,body)=>`<section class="sec"><h2>${t}</h2>${h?`<p class="hint">${h}</p>`:''}${body}</section>`;
+const single=(id,t,opts,sub)=>`<div class="q" data-q="${id}"><div class="t">${t}</div>${sub?`<div class="s">${sub}</div>`:''}<div class="opts">${opts.map(o=>`<button type="button" class="opt" data-single="${id}" data-v="${esc(o)}" aria-pressed="false">${esc(o)}</button>`).join('')}</div></div>`;
+const scaleRow=(grp,key,label,vals,naLabel)=>`<div class="row"><div class="l">${esc(label)}</div><div class="sc">${naLabel?`<button type="button" class="opt na" data-grid="${grp}" data-k="${esc(key)}" data-v="0" aria-pressed="false">${naLabel}</button>`:''}${vals.map(v=>`<button type="button" class="opt" data-grid="${grp}" data-k="${esc(key)}" data-v="${v}" aria-pressed="false">${v}</button>`).join('')}</div></div>`;
+html+=sec('Зөвшөөрөл','',`<label class="chk"><input type="checkbox" id="consent"> Би судалгааны зорилготой танилцаж, сайн дураараа оролцохыг зөвшөөрч байна.</label>`);
+html+=sec('1. Таны тухай','',
+  single('q1','1. Таны албан тушаал',['Бүлгийн багш','Туслах багш','Арга зүйч / удирдлага'])+
+  single('q2','2. Гарааны судалгаанд (2026.11.10) оролцсон уу?',['Тийм','Үгүй','Санахгүй байна'])+
+  single('q3','3. ДЭВШИЛ+-ийг хэр удаан ашиглаж байна вэ?',['1 долоо хоногоос бага','1–4 долоо хоног','1–3 сар','3 сараас дээш'])+
+  single('q4','4. ДЭВШИЛ+-ийг хэр давтамжтай ашигладаг вэ?',['Бараг өдөр бүр','Долоо хоногт хэдэн удаа','Сард хэдэн удаа','Ховор']));
+html+=sec('2. Ажлын хэлбэр, цаг, хүндрэл','Одоогийн байдлаараа хариулна уу.',
+  `<div class="q"><div class="t">5а. Дараах ажлыг ОДОО ямар хэлбэрээр хийдэг вэ?</div><div class="s">Олныг сонгож болно.</div>${TASKS.map(t=>`<div class="row"><div class="l">${esc(t)}</div><div class="sc">${FORMS.map(f=>`<button type="button" class="opt" data-multi="${esc(t)}" data-v="${esc(f)}" aria-pressed="false">${esc(f)}</button>`).join('')}</div></div>`).join('')}</div>`+
+  `<div class="q"><div class="t">5б. Ажил тус бүрт ОДОО долоо хоногт ойролцоогоор хэдэн цаг зарцуулдаг вэ?</div><div class="s">Тоогоор, 0–40 цаг.</div>${TASKS.map((t,i)=>`<div class="row"><div class="l">${esc(t)}</div><div><input type="number" min="0" max="40" step="0.5" inputmode="decimal" data-hours="${esc(t)}" aria-label="${esc(t)} — цаг"></div></div>`).join('')}</div>`+
+  `<div class="q"><div class="t">5в. Дараах ажил ОДОО хэр хэцүү байна вэ?</div><div class="s">1 = маш хялбар, 5 = маш хэцүү</div>${TASKS.map(t=>scaleRow('q5c',t,t,[1,2,3,4,5])).join('')}</div>`+
+  single('q6','6. Бичиг баримт, төлөвлөлтийг ажлын цагаас гадуур (гэртээ) хийх нь ОДОО хэр түгээмэл вэ?',['Бараг өдөр бүр','Долоо хоногт хэдэн удаа','Сард хэдэн удаа','Бараг хийдэггүй'])+
+  single('q7','7. Бичиг баримтын ажил хүүхэдтэй шууд ажиллах цагийг тань ОДОО хэр хумьдаг вэ?',['Маш их','Нэлээд','Бага зэрэг','Огт хумьдаггүй'])+
+  `<div class="q"><div class="t">8. Хэр зөвшөөрч байгаагаа тэмдэглэнэ үү</div><div class="s">1 = огт зөвшөөрөхгүй, 5 = бүрэн зөвшөөрнө</div>${B.map(([k,l])=>scaleRow('q8',k,l,[1,2,3,4,5])).join('')}</div>`);
+html+=sec('3. ДЭВШИЛ+-ийн талаарх үнэлгээ','',
+  `<div class="q"><div class="t">9. Хэр зөвшөөрч байгаагаа тэмдэглэнэ үү</div><div class="s">1 = огт зөвшөөрөхгүй, 5 = бүрэн зөвшөөрнө</div>${A.map(([k,l])=>scaleRow('q9',k,l,[1,2,3,4,5])).join('')}</div>`+
+  `<div class="q"><div class="t">10. Дараах хэсгүүд танд хэр хэрэгтэй байна вэ?</div><div class="s">1 = огт хэрэггүй, 5 = маш хэрэгтэй</div>${M.map(m=>scaleRow('q10',m,m,[1,2,3,4,5],'Ашиглаагүй')).join('')}</div>`+
+  single('q11','11. «AI-аар цэгцлэх» туслахын бичсэн ноорогийг хадгалахаасаа өмнө шалгадаг уу?',['Үргэлж шалгаж, засдаг','Ихэвчлэн','Заримдаа','Шалгадаггүй','Ашиглаагүй'])+
+  single('q12','12. ДЭВШИЛ+-ийг цаашид ашиглах уу?',['Заавал ашиглана','Ашиглаж магадгүй','Ашиглахгүй'])+
+  `<div class="q"><div class="t">13. ДЭВШИЛ+-ийг бусад цэцэрлэгийн багш нарт санал болгох уу?</div><div class="scale-lab"><span>0 = огт санал болгохгүй</span><span>10 = заавал</span></div><div class="sc">${[0,1,2,3,4,5,6,7,8,9,10].map(v=>`<button type="button" class="opt" data-single="q13" data-v="${v}" aria-pressed="false">${v}</button>`).join('')}</div></div>`);
+html+=sec('4. Нээлттэй асуулт','Заавал биш.',
+  `<div class="q"><div class="t">14. ДЭВШИЛ+ таны ажилд хамгийн их юугаараа тусалсан бэ?</div><textarea data-text="q14" maxlength="1500"></textarea></div>`+
+  `<div class="q"><div class="t">15. Ямар хүндрэл гарсан бэ? Юуг сайжруулах вэ?</div><textarea data-text="q15" maxlength="1500"></textarea></div>`+
+  `<div class="q"><div class="t">16. Бусад санал</div><textarea data-text="q16" maxlength="1500"></textarea></div>`);
+html+=`<button type="submit" class="send" id="send">📨 Илгээх</button><p class="err" id="err" role="alert"></p>`;
+const f=document.getElementById('f');f.innerHTML=html;
+const total=4+6+6+6+2+5+6+9+3; // хариулах боломжтой үндсэн зүйлс
+function progress(){let n=0;['q1','q2','q3','q4','q6','q7','q11','q12','q13'].forEach(k=>{if(ans[k]!==undefined)n++});
+  n+=Object.keys(ans.q5a).length+Object.keys(ans.q5b).length+Object.keys(ans.q5c).length+Object.keys(ans.q8).length+Object.keys(ans.q9).length+Object.keys(ans.q10).length;
+  document.getElementById('prog').style.width=Math.min(100,Math.round(n/total*100))+'%';}
+f.addEventListener('click',e=>{const b=e.target.closest('button.opt');if(!b)return;
+  if(b.dataset.single){const k=b.dataset.single;f.querySelectorAll(`[data-single="${k}"]`).forEach(x=>x.setAttribute('aria-pressed',String(x===b)));ans[k]=k==='q13'?Number(b.dataset.v):b.dataset.v;}
+  else if(b.dataset.grid){const g=b.dataset.grid,k=b.dataset.k;b.parentElement.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));ans[g][k]=Number(b.dataset.v);}
+  else if(b.dataset.multi){const t=b.dataset.multi,on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));const set=new Set(ans.q5a[t]||[]);on?set.add(b.dataset.v):set.delete(b.dataset.v);if(set.size)ans.q5a[t]=[...set];else delete ans.q5a[t];}
+  progress();});
+f.addEventListener('input',e=>{const h=e.target.dataset.hours;if(h!==undefined){const v=e.target.value.trim();if(v==='')delete ans.q5b[h];else ans.q5b[h]=Number(v);progress();}});
+f.addEventListener('submit',async e=>{e.preventDefault();const err=document.getElementById('err'),btn=document.getElementById('send');err.textContent='';
+  if(!document.getElementById('consent').checked){err.textContent='Эхлээд хамгийн дээрх зөвшөөрлийг чагтална уу.';document.getElementById('consent').scrollIntoView({behavior:'smooth',block:'center'});return}
+  for(const [t,v] of Object.entries(ans.q5b)){if(!(v>=0&&v<=40)){err.textContent='5б: «'+t+'» — цагийг 0–40 хооронд бичнэ үү.';return}}
+  if(Object.keys(ans.q5c).length+Object.keys(ans.q9).length<3){err.textContent='Ихэнх асуултад хариулаагүй байна. Хариулаад илгээнэ үү.';return}
+  f.querySelectorAll('[data-text]').forEach(t=>{const v=t.value.trim();if(v)ans[t.dataset.text]=v});
+  btn.disabled=true;btn.textContent='Илгээж байна…';
+  try{const r=await fetch(SB_URL+'/rest/v1/'+TABLE,{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({answers:ans})});
+    if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(_){}throw Error(r.status+' '+m)}
+    try{localStorage.setItem('dv_impact_done','1')}catch(_){}
+    document.getElementById('app').innerHTML='<div class="sec done"><div class="big">💜</div><h2>Баярлалаа!</h2><p>Таны хариулт амжилттай илгээгдлээ.</p></div>';window.scrollTo(0,0);
+  }catch(x){btn.disabled=false;btn.textContent='📨 Илгээх';err.textContent='Илгээж чадсангүй ('+x.message+'). Интернэтээ шалгаад дахин дарна уу.';}
+});
+try{if(localStorage.getItem('dv_impact_done')==='1'){const n=document.createElement('p');n.className='hint';n.style.cssText='background:#fff7e6;border:1px solid #ffe0a3;border-radius:12px;padding:10px;margin:0 0 12px;font-size:13px';n.textContent='Та энэ төхөөрөмжөөс аль хэдийн илгээсэн байна. Өөр багш энэ утсаар бөглөж байгаа бол үргэлжлүүлж болно.';f.prepend(n)}}catch(_){}
+progress();
+})();
+</script>
+</body>
+</html>
