@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Эцэг эх, асран хамгаалагчийн судалгаа</title>
+<style>
+:root{--ink:#2d1a52;--sec:#6b5a86;--line:#e8def8;--bg:#f7f4fd;--acc:#6d3fd6;--acc2:#8b45e8;--ok:#15803d;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.hero{background:linear-gradient(120deg,#5b2bc4,#8b45e8 60%,#c04fd8);color:#fff;border-radius:22px;padding:22px 22px 18px;margin-bottom:16px;box-shadow:0 10px 30px rgba(91,43,196,.25)}
+.hero h1{margin:0 0 6px;font-size:23px;line-height:1.25}
+.hero p{margin:0;opacity:.95;font-size:14px}
+.prog{height:8px;border-radius:9px;background:rgba(255,255,255,.3);margin-top:14px;overflow:hidden}
+.prog>span{display:block;height:100%;width:0;background:#fff;border-radius:9px;transition:width .2s}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 4px 14px rgba(80,40,140,.05)}
+.sec>h2{margin:0 0 4px;font-size:17px}
+.sec>.hint{margin:0 0 12px;color:var(--sec);font-size:13px}
+.q{padding:12px 0;border-top:1px solid #f1ecf8}
+.q:first-of-type{border-top:0}
+.q>.t{font-weight:700;margin-bottom:8px;font-size:15px}
+.q>.s{color:var(--sec);font-size:12px;margin:-4px 0 8px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1px solid #d9cbf3;background:#fbf9ff;color:var(--ink);border-radius:12px;padding:9px 13px;font:inherit;font-size:14px;cursor:pointer;min-height:42px;text-align:left}
+.opt[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:8px 0;border-top:1px dashed #efe8fa}
+.row:first-child{border-top:0}
+.row .l{font-size:14px}
+.sc{display:flex;gap:6px;flex-wrap:wrap}
+.sc .opt{min-width:40px;padding:8px 10px;text-align:center}
+.sc .opt.na{min-width:auto}
+.scale-lab{display:flex;justify-content:space-between;color:var(--sec);font-size:11px;margin:2px 0 6px}
+input[type=number],textarea{width:100%;font:inherit;border:1px solid #d9cbf3;border-radius:12px;padding:10px 12px;background:#fff;color:var(--ink)}
+input[type=number]{max-width:110px}
+textarea{min-height:80px;resize:vertical}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:700;cursor:pointer}
+.chk input{width:22px;height:22px;margin-top:2px;flex:none;accent-color:var(--acc)}
+.send{width:100%;border:0;border-radius:16px;padding:16px;font:inherit;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(120deg,#5b2bc4,#8b45e8);cursor:pointer;box-shadow:0 8px 22px rgba(91,43,196,.3)}
+.send:disabled{opacity:.6;cursor:default}
+.err{color:#b42318;font-weight:700;font-size:14px;margin:10px 0 0;min-height:1em}
+.done{text-align:center;padding:40px 20px}
+.done .big{font-size:56px}
+.done h2{margin:10px 0 6px}
+@media(max-width:560px){.row{grid-template-columns:1fr}.hero h1{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="hero"><h1>🏡 Эцэг эх, асран хамгаалагчийн судалгаа</h1>
+  <p>Цахим гэрийн даалгавар ба «Бяцхан зураач»-ийн талаар таны санал. Нэргүй, 5 минут. Замын-Үүд сумын Хүүхдийн 5 дугаар цэцэрлэг.</p>
+  <div class="prog"><span id="prog"></span></div></div>
+  <form id="f" novalidate></form>
+</div>
+<script>
+(function(){'use strict';
+const SB_URL='https://xffvtthmtaunedadwfpg.supabase.co';
+const SB_KEY='sb_publishable_dC0mZGOjXSHQlojelljYeQ_MEBiMPoJ';
+const TABLE='devshil_impact_survey';
+const ans={form:'eh'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sec=(t,h,body)=>`<section class="sec"><h2>${t}</h2>${h?`<p class="hint">${h}</p>`:''}${body}</section>`;
+const single=(id,t,opts,sub)=>`<div class="q"><div class="t">${t}</div>${sub?`<div class="s">${sub}</div>`:''}<div class="opts">${opts.map(o=>`<button type="button" class="opt" data-single="${id}" data-v="${esc(o)}" aria-pressed="false">${esc(o)}</button>`).join('')}</div></div>`;
+const scale=(id,t,lo,hi)=>`<div class="q"><div class="t">${t}</div><div class="scale-lab"><span>1 = ${lo}</span><span>5 = ${hi}</span></div><div class="sc">${[1,2,3,4,5].map(v=>`<button type="button" class="opt" data-single="${id}" data-num="1" data-v="${v}" aria-pressed="false">${v}</button>`).join('')}</div></div>`;
+let html='';
+html+=sec('Зөвшөөрөл','',`<label class="chk"><input type="checkbox" id="consent"> Би судалгааны зорилготой танилцаж, сайн дураараа оролцохыг зөвшөөрч байна.</label>`);
+html+=sec('1. Таны тухай','',
+  single('p1','1. Та хүүхдийн хэн бэ?',['Ээж','Аав','Асран хамгаалагч','Бусад'])+
+  single('p2','2. Таны хүүхэд аль бүлэгт явдаг вэ?',['Бага','Дунд','Ахлах','Бэлтгэл']));
+html+=sec('2. Цахим гэрийн даалгавар','',
+  single('p3','3. ДЭВШИЛ+-ээр ирсэн гэрийн даалгаврыг хэр олон нээж үздэг вэ?',['Бараг бүгдийг','Ихэнхийг','Заримыг','Үзэж байгаагүй'])+
+  single('p4','4. Долоо хоногт хүүхэдтэйгээ гэрийн даалгавар хэдэн удаа давтдаг вэ?',['Давтдаггүй','1 удаа','2–3 удаа','4-өөс олон'])+
+  scale('p5','5. Хүүхэд гэртээ давтахдаа хэр сонирхолтой оролцдог вэ?','огт сонирхдоггүй','маш их сонирхдог'));
+html+=sec('3. «Бяцхан зураач»','',
+  single('p6','6. «Бяцхан зураач»-ийг гэртээ ашиглаж байсан уу?',['Тийм, тогтмол','Тийм, заримдаа','Үгүй'])+
+  scale('p7','7. Хэрэв ашигласан бол хүүхэд хэр дуртай вэ?','огт дургүй','маш их дуртай')+
+  single('p8','8. Хүүхдийн зурах сонирхол, чадварт өөрчлөлт ажиглагдсан уу?',['Их сайжирсан','Бага зэрэг сайжирсан','Өөрчлөгдөөгүй','Мэдэхгүй']));
+html+=sec('4. Ерөнхий үнэлгээ','',
+  single('p9','9. Хүүхэд цэцэрлэгт юу сурч байгааг мэдэх боломж өмнөхөөс хэр өөрчлөгдсөн бэ?',['Их нэмэгдсэн','Бага зэрэг нэмэгдсэн','Өөрчлөгдөөгүй'])+
+  scale('p10','10. Платформыг ашиглахад хэр хялбар вэ?','маш хэцүү','маш хялбар')+
+  `<div class="q"><div class="t">11. Гэрийн даалгавар, «Бяцхан зураач»-ийг сайжруулах санал</div><div class="s">Заавал биш.</div><textarea data-text="p11" maxlength="1500"></textarea></div>`);
+html+=`<button type="submit" class="send" id="send">📨 Илгээх</button><p class="err" id="err" role="alert"></p>`;
+const f=document.getElementById('f');f.innerHTML=html;
+const KEYS=['p1','p2','p3','p4','p5','p6','p7','p8','p9','p10'];
+function progress(){const n=KEYS.filter(k=>ans[k]!==undefined).length;document.getElementById('prog').style.width=Math.round(n/KEYS.length*100)+'%';}
+f.addEventListener('click',e=>{const b=e.target.closest('button.opt');if(!b)return;const k=b.dataset.single;
+  f.querySelectorAll(`[data-single="${k}"]`).forEach(x=>x.setAttribute('aria-pressed',String(x===b)));ans[k]=b.dataset.num?Number(b.dataset.v):b.dataset.v;progress();});
+f.addEventListener('submit',async e=>{e.preventDefault();const err=document.getElementById('err'),btn=document.getElementById('send');err.textContent='';
+  if(!document.getElementById('consent').checked){err.textContent='Эхлээд хамгийн дээрх зөвшөөрлийг чагтална уу.';document.getElementById('consent').scrollIntoView({behavior:'smooth',block:'center'});return}
+  if(KEYS.filter(k=>ans[k]!==undefined).length<5){err.textContent='Ихэнх асуултад хариулаагүй байна. Хариулаад илгээнэ үү.';return}
+  f.querySelectorAll('[data-text]').forEach(t=>{const v=t.value.trim();if(v)ans[t.dataset.text]=v});
+  btn.disabled=true;btn.textContent='Илгээж байна…';
+  try{const r=await fetch(SB_URL+'/rest/v1/'+TABLE,{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({answers:ans})});
+    if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(_){}throw Error(r.status+' '+m)}
+    document.getElementById('app').innerHTML='<div class="sec done"><div class="big">💜</div><h2>Баярлалаа!</h2><p>Таны хариулт амжилттай илгээгдлээ.</p></div>';window.scrollTo(0,0);
+  }catch(x){btn.disabled=false;btn.textContent='📨 Илгээх';err.textContent='Илгээж чадсангүй ('+x.message+'). Интернэтээ шалгаад дахин дарна уу.';}
+});
+progress();
+})();
+</script>
+</body>
+</html>
